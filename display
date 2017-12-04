@@ -1,14 +1,62 @@
+--currently called SecuritySystem to test just VGA
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all; 
 
-entity display is 
+entity SecuritySystem is 
    port(
  clk, reset: in std_logic;
  btn: in std_logic_vector (1 downto 0);
  hsync, vsync: out std_logic;
  rgb: out std_logic_vector (2 downto 0)
  ); 
- end display;
+ end SecuritySystem;
  
- architecture arch of display 
+ architecture arch of SecuritySystem is
+	type state_type is (sysArmed, sysDisarmed);
+	signal video_on, pixel_tick, armed1_on, disarmed1_on: std_logic;
+	signal pixel_x, pixel_y: std_logic_vector(9 downto 0);
+	signal text_on: std_logic_vector(3 downto 0);
+	signal text_rgb: std_logic_vector(2 downto 0);
+	signal rgb_reg, rgb_next: std_logic_vector(2 downto 0);
+	signal state_reg, state_next: state_type;
+
+	begin
+	--intantiate video synchonization unit
+		vga_sync_unit: entity work.vga_sync
+			port map(clk=>clk, reset=>reset, hsync=>hsync, vsync=>vsync, pixel_x=>pixel_x, pixel_y=>pixel_y, video_on=>video_on, p_tick=>pixel_tick);
+	
+ --intantiate text
+		text_unit: entity work.textGen
+			port map(clk=>clk, reset=>reset, pixel_x=>pixel_x, pixel_y=>pixel_y, text_on=>text_on, text_rgb=>text_rgb);
+
+		
+	process (state_reg, video_on,text_on,text_rgb)
+	begin
+
+	case state_reg is
+	when sysArmed =>
+		armed1_on<='1';
+		text_unit: entity work.armed
+			port map (clk=>clk, reset=>reset, pixel_x=>pixel_x, pixel_y=>pixel_y, text_on=>text_on, text_rgb=>text_rgb, armed1_on=>armed_on);
+	when sysDisarmed =>
+		disarmed1_on<='1';
+		text_unit: entity work.armed
+			port map (clk=>clk, reset=>reset, pixel_x=>pixel_x, pixel_y=>pixel_y, text_on=>text_on, text_rgb=>text_rgb, disarmed1_on=>disarmed_on);
+	end case;
+	
+		if video_on='0' then
+			rgb_next<="000";
+		else
+			if (correct='1')
+				(state_reg=sysArmed)
+				rgb_next <= text_rgb;
+			elsif (correct='0')
+				(state_reg <= sysDisarmed)
+				rgb_next <= text_rgb;
+			end if;
+		end if;
+	end process;
+	rgb<=rgb_reg;
+	end arch;
+	
