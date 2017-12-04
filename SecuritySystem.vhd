@@ -1,54 +1,89 @@
 Library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 
-entity passcode is 
-	port (but_n1, but_n2, but_n3 : in : std_logic;
-			rightCode : out : std_logic);
-end passcode;
+entity SecuritySystem is 
+	port (reset, clk : in std_logic;
+			door_n : in std_logic;
+			a1, b1, c1, d1, e1, f1, g1 : out std_logic;
+			a2, b2, c2, d2, e2, f2, g2 : out std_logic);
+	end SecuritySystem;
 	
-architecture beh of passcode is 
+architecture beh of SecuritySystem is 
+
+type state_type is (STATE_Idle, STATE_Count, STATE_Alarm); 
+signal state : state_type := STATE_Idle;
+signal tens, ones : std_logic_vector(3 downto 0);
+signal counter10 : std_logic_vector(28 downto 0);
+signal counter1 : std_logic_vector(25 downto 0);
+signal in0, in1, in2, in3 : std_logic;
+signal code : std_logic;
+
 begin
-	type state_type is (STATE_A, STATE_B, STATE_C, STATE_D, STATE_E, STATE_F); 
-	signal state : state_type := STATE_A;
-	process(but_n1, but_n2, but_n3) 
+	
+	process(reset, clk, door_n)
 	begin
-		if but_n1'event and but_n1 = '0' or but_n2'event and but_n2 = '0' or but_n3'event and but_n3 = '0' then 	-- state changes when a button is pressed
-		case state is
-		
-		when STATE_A =>
-		if but_n2 = '0' then
-			state <= STATE_B;
-		else
-			state <= STATE_F;
-		end if;
-		
-		when STATE_B =>
-		if but_n1 = '0' then
-			state <= STATE_C;
-		else 
-			state <= STATE_F;
-		end if;
-		
-		when STATE_C =>
-		if but_n3 = '0' then
-			state <= STATE_D;
-		else 
-			state <= STATE_F;
-		end if;
-		
-		when STATE_D =>
-		if but_n1 = '0' then
-			state <= STATE_E;
-		else
-			state <= STATE_E;
-		end if;
-		
-		when STATE_E => 
-			rightCode = '1';
+		if reset = '1' then              
+			state <= STATE_Idle;
+		elsif clk'event and clk = '1' then
+			case state is
 			
-		when STATE_F =>
-			rightCode = '0';
-			
-			
+				when STATE_Idle =>
+					if door_n = '0' then
+						state <= STATE_Count;
+					else
+						state <= STATE_Idle;
+					end if;
+				
+				
+				when STATE_Count =>
+					tens <= "0110";
+					if counter10 < "11101110011010110010100000000" then
+						counter10 <= counter10 + 1;
+					else 
+						tens <= tens - 1;
+					end if;
+					
+					ones <= "0000";
+					if counter1 < "10111110101111000010000000" then
+						counter1 <= counter1 + 1;
+					elsif ones = "0000" then
+						ones <= "1001";
+					else 
+						ones <= ones - 1;
+					end if;
+					
+					if code = '1' then
+						state <= STATE_Idle;
+					elsif tens = "0000" and ones = "0000" or code = '0' then
+						state <= STATE_Alarm;
+					end if;
+					
+				
+				when STATE_Alarm =>
+					state <= STATE_Idle;
+					
+			end case;
+		end if;
 	end process;
+	
+	component sevenSegDisplay 
+		port (in0, in1, in2, in3 : in std_logic;
+			a, b, c, d, e, f, g : out std_logic); 
+	end component;
+	
+	display10s : sevenSegDisplay port map
+					(tens(3), tens(2), tens(1), tens(0),
+					 a1, b1, c1, d1, e1, f1, g1);
+					 
+	display1s : sevenSegDisplay port map
+					(ones(3), ones(2), ones(1), ones(0),
+					 a2, b2, c2, d2, e2, f2, g2);
+					 
+	component passcode
+		port (rightCode : out std_logic)
+	end component;
+	
+	passcode1 : passcode port map
+					(code);
+	
 end beh;
