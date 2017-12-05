@@ -93,11 +93,11 @@ begin
 		text_rgb <= "100";
 end if;
 end process;
-	if --switch flipped
-	text_on <= armed_on;
-	elsif --passcode correct
-	text_on <= disarmed_on;
-end if;
+	--if --switch flipped
+	--text_on <= armed_on;
+	--elsif --passcode correct
+	--text_on <= disarmed_on;
+--end if;
 	
 
 -- font rom interface
