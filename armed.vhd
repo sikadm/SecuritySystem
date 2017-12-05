@@ -41,6 +41,19 @@ begin
 	font1: font_rom port map(clk, rom_addr, font_word);
 
 --Display System Armed
+when (pix_y(9 downto 5)=0 and pix_x(9 downto 4)<16) 
+	armed_on<='1';
+	disarmed_on<=0;
+else
+	armed_on<='0';
+	disarmed_on<=1;
+
+row_addr_a <= std_logic_vector(pix_y(5 downto 2));
+bit_addr_a <= std_logic_vector(pix_x(4 downto 2));
+row_addr_d <= std_logic_vector(pix_y(5 downto 2));
+bit_addr_d <= std_logic_vector(pix_x(4 downto 2));
+
+
 	with pix_x(8 downto 5) select char_addr_a <=
 		"1010011" when "0100", -- S
 		"1111001" when "0101", -- y
@@ -75,22 +88,9 @@ begin
 		"1100101" when "1110", -- e
 		"1100100" when "1111", -- d
 		"0000000" when others; --
-		
-process(pix_x, pix_y, textdisplay)
-begin
-if textdisplay='1' then 
-	armed_on <='1';
-	disarmed_on<='0';	
-	else
-	armed_on<='0';
-	disarmed_on<='1';
-	row_addr_a <= std_logic_vector(pix_y(5 downto 2));
-	bit_addr_a <= std_logic_vector(pix_x(4 downto 2));
-	row_addr_d <= std_logic_vector(pix_y(5 downto 2));
-	bit_addr_d <= std_logic_vector(pix_x(4 downto 2));
 
-end if;
-end process;
+		
+
 -- mux for font ROM addresses and rgb
 process(pix_x, pix_y, font_bit,char_addr_a,row_addr_a,bit_addr_a, char_addr_d, row_addr_d, bit_addr_d)
 begin
@@ -99,23 +99,22 @@ begin
 		char_addr <= char_addr_a;
 		row_addr <= row_addr_a;
 		bit_addr <= bit_addr_a;
-		text_rgb <= "010";
-
+		if font_bit='1' then
+			text_rgb <= "010";
+		end if;
 
 	else
 		char_addr <= char_addr_d;
 		row_addr <= row_addr_d;
 		bit_addr <= bit_addr_d;
-		text_rgb <= "100";
+		if font_bit='1' then
+			text_rgb <= "100";
+		end if;
+		
 
 end if;
 end process;
-	--if --switch flipped
-	--text_on <= armed_on;
-	--elsif --passcode correct
-	--text_on <= disarmed_on;
---end if;
-	
+text_on<=armed_on & disarmed_on;
 
 -- font rom interface
 	rom_addr <= (char_addr & row_addr);
