@@ -7,7 +7,8 @@ entity SecuritySystem is
    port(
  clk, reset: in std_logic;
  btn: in std_logic_vector (1 downto 0);
- hsync, vsync: out std_logic;
+ hsync, vsync, enable, blank, sync: out std_logic;
+ column1, row1: out integer;
  rgb: out std_logic_vector (2 downto 0)
  ); 
  end SecuritySystem;
@@ -20,11 +21,11 @@ entity SecuritySystem is
 	signal text_rgb: std_logic_vector(2 downto 0);
 	signal rgb_reg, rgb_next: std_logic_vector(2 downto 0);
 	signal state_reg, state_next: state_type;
+	
 
 	begin
-	--intantiate video synchonization unit
-		VGA1: vga_sync port map (clk, reset, hsync, vsync, pixel_x, pixel_y, video_on, pixel_tick);
-			--port(clk=>clk, reset=>reset, hsync=>hsync, vsync=>vsync, pixel_x=>pixel_x, pixel_y=>pixel_y, video_on=>video_on, p_tick=>pixel_tick);
+--intantiate video synchonization unit
+		VGA1: vga_sync port map (clk, reset, hsync, vsync, enable, column1, row1, blank, sync);
 	
  --intantiate text
 		text1: textGen port map (clk, reset, btn, sw, video_on, pixel_x, pixel_y, text_rgb);
