@@ -46,7 +46,7 @@ ENTITY vga_sync IS
     n_sync    :  OUT  STD_LOGIC); --sync-on-green output to DAC
 END vga_sync;
 
-ARCHITECTURE behavior OF vga_controller IS
+ARCHITECTURE behavior OF vga_sync IS
   CONSTANT  h_period  :  INTEGER := h_pulse + h_bp + h_pixels + h_fp;  --total number of pixel clocks in a row
   CONSTANT  v_period  :  INTEGER := v_pulse + v_bp + v_pixels + v_fp;  --total number of rows in column
 BEGIN
