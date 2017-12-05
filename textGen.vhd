@@ -1,5 +1,4 @@
 --Based off lecture slide source
---may be Xilinx so need to find another source to compare to
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -12,11 +11,10 @@ entity textGen is
 		sw: std_logic_vector(6 downto 0);
 		video_on: in std_logic;
 		pixel_x, pixel_y: std_logic_vector(9 downto 0);
-		tex_rgb: out std_logic_vector(2 downto 0);
-		);
+		text_rgb: out std_logic_vector(2 downto 0));
 end textGen;
 
-architecture of arch of textGen is 
+architecture arch of textGen is 
 	--font ROM
 	signal rom_addr: std_logic_vector(10 downto 0);
 	signal char_addr: std_logic_vector(6 downto 0);
@@ -43,23 +41,12 @@ architecture of arch of textGen is
 	signal pix_x1_reg, pix_x2_reg, pix_y1_reg, pix_y2_reg: unsigned (9 downto 0);	--delayed pixel count
 	signal font_rgb, font_rev_rgb: std_logic_vector(2 downto 0);	--object output signals
 	
+begin	
+	
+	--registers
+	process (clk)
 	begin	
-	--intantiate debounce circuit for 2 buttons
-		debounce_unit0: entity work.debounce
-			port map(clk=>clk, reset=>reset, sw=>btn(0),db_level=>open, db_tick=>move_x_tick);
-		debounce_unit1: entity work.debounce
-			port map(clk=>clk, reset=>reset, sw=>btn(1),db_level=>open,db_tick=>move_y_tick);
-	--instantiate font ROM
-		font_unit:entity work.font_rom
-			port map(clk=>clk, addr=>rom_addr,data=>font_word);
-	--instantiate dual port tile RAM (2^12-by-7)
-		video_ram: entity work.xilinx_dual_port_ram_sync
-			generic map (ADDR_WIDTH=>12, DATA_WIDTH=>7)
-			port map(clk=>clk, we=>we, addr_a=>addr_w, addr_b=>addr_r, din_a=>din, dout_a=>open, dout_b=>dout);
-			
-		--registers
-		process (clk)
-		begin	if(clk'event and clk='1') then
+		if(clk'event and clk='1') then
 			cur_x_reg <= cur_x_next;
 			cur_y_reg <= cur_y_next;
 			pix_x1_reg <= unsigned(pixel_x); -- 2 clock delay
@@ -108,14 +95,11 @@ architecture of arch of textGen is
 		-- rgb multiplexing circuit
 		process(video_on,cursor_on,font_rgb,font_rev_rgb)
 		begin
-		if video_on='0' then
-		text_rgb <= "000"; --blank
-		else
 		if cursor_on='1' then
-		text_rgb <= font_rev_rgb;
+		text_rgb <=font_rev_rgb;
 		else
-		text_rgb <= font_rgb;
+		text_rgb <=font_rgb;
 		end if;
-		end if;
+
 		end process;
 end arch;
