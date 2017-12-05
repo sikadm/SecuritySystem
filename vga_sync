@@ -23,7 +23,7 @@ ENTITY vga_sync IS
     row       :  OUT  INTEGER;    --vertical pixel coordinate
     n_blank   :  OUT  STD_LOGIC;  --direct blacking output to DAC
     n_sync    :  OUT  STD_LOGIC); --sync-on-green output to DAC
-END vga_controller;
+END vga_sync;
 
 ARCHITECTURE behavior OF vga_controller IS
   CONSTANT  h_period  :  INTEGER := h_pulse + h_bp + h_pixels + h_fp;  --total number of pixel clocks in a row
