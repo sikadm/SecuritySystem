@@ -47,7 +47,8 @@ if pix_y(9 downto 5)='0' and pix_x(9 downto 4)<16 then
 else
 	armed_on<='0';
 	disarmed_on<=1;
-
+end if; 
+	
 row_addr_a <= std_logic_vector(pix_y(5 downto 2));
 bit_addr_a <= std_logic_vector(pix_x(4 downto 2));
 row_addr_d <= std_logic_vector(pix_y(5 downto 2));
