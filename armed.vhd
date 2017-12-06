@@ -7,7 +7,7 @@ entity armed is
 	port(
 		clk, reset, textdisplay: in std_logic;
 		pixel_x, pixel_y: in std_logic_vector(9 downto 0);
-		text_on: out std_logic_vector(1 downto 0);
+		text_on: out std_logic;
 		text_rgb: out std_logic_vector(2 downto 0)
 	);
 end armed;
@@ -21,7 +21,6 @@ architecture arch of armed is
 	signal font_word: std_logic_vector(7 downto 0);
 	signal font_bit: std_logic;
 	signal armed_on: std_logic;
-	signal disarmed_on: std_logic;
 	signal counterA: std_logic_vector(14 downto 0);
 	signal counterB: std_logic_vector(12 downto 0);
 
@@ -43,10 +42,8 @@ begin
 --Display System Armed
 if pix_y(9 downto 5)='0' and pix_x(9 downto 4)<16 then
 	armed_on<='1';
-	armed_off<='0';
 else
 	armed_on<='0';
-	disarmed_on<=1;
 end if; 
 	
 row_addr_a <= std_logic_vector(pix_y(5 downto 2));
@@ -101,21 +98,21 @@ begin
 		row_addr <= row_addr_a;
 		bit_addr <= bit_addr_a;
 		if font_bit='1' then
-			text_rgb <= "010";
+			text_rgb <= "010"; --green text
 		end if;
 
-	else
+	else --disarmed
 		char_addr <= char_addr_d;
 		row_addr <= row_addr_d;
 		bit_addr <= bit_addr_d;
 		if font_bit='1' then
-			text_rgb <= "100";
+			text_rgb <= "100"; --red text
 		end if;
 		
 
 end if;
 end process;
-text_on<=armed_on & disarmed_on;
+text_on<=armed_on;
 
 -- font rom interface
 	rom_addr <= (char_addr & row_addr);
