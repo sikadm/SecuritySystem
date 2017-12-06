@@ -42,7 +42,19 @@ architecture arch of textGen is
 	signal font_rgb, font_rev_rgb: std_logic_vector(2 downto 0);	--object output signals
 	
 begin	
+	component font_rom
+		port
+			
+			);
+	end component;
 	
+	F3: font_rom port map (portsss);
+
+--instantiate dual port tile RAM (2^12-by-7)
+	--component
+	--generic map(ADDR_WIDTH=>12, DATA_WIDTH=>7)
+	--port map(clk,we,addr_w,addr_r,din,open,dout);
+		
 	--registers
 	process (clk)
 	begin	
@@ -56,22 +68,22 @@ begin
 		end if;
 		end process;
 		
-			-- tile RAM write
+	-- tile RAM write
 		addr_w <=std_logic_vector(cur_y_reg & cur_x_reg);
 		we <= btn(2);
 		din <= sw;
-		-- tile RAM read
-		-- use non-delayed coordinates to form tile RAM address
+	-- tile RAM read
+	-- use non-delayed coordinates to form tile RAM address
 		addr_r <=pixel_y(8 downto 4) & pixel_x(9 downto 3);
 		char_addr <= dout;
 		-- font ROM
 		row_addr<=pixel_y(3 downto 0);
 		rom_addr <= char_addr & row_addr;
-		-- use delayed coordinate to select a bit
+	-- use delayed coordinate to select a bit
 		bit_addr<=pix_x2_reg(2 downto 0);
 		font_bit <= font_word(to_integer(not bit_addr));	
 		
-		-- new cursor position
+	-- new cursor position
 		cur_x_next <=
 		(others=>'0') when move_x_tick='1' and -- wrap around
 		cur_x_reg=MAX_X-1 else
@@ -83,23 +95,26 @@ begin
 		cur_y_reg + 1 when move_y_tick='1' else
 		cur_y_reg;
 		
-		-- object signals
-		-- green over black and reversed video for courser
+	-- object signals
+	-- green over black and reversed video for courser
 		font_rgb <="010" when font_bit='1' else "000";
 		font_rev_rgb <="000" when font_bit='1' else "010";
-		-- use delayed coordinates for comparison
+	-- use delayed coordinates for comparison
 		cursor_on <='1' when pix_y2_reg(8 downto 4)=cur_y_reg and
 		pix_x2_reg(9 downto 3)=cur_x_reg else
 		'0';
 		
-		-- rgb multiplexing circuit
+	-- rgb multiplexing circuit
 		process(video_on,cursor_on,font_rgb,font_rev_rgb)
 		begin
+		if video_on='0' then
+			text_rgb<="000"; -blank
+		else
 		if cursor_on='1' then
 		text_rgb <=font_rev_rgb;
 		else
 		text_rgb <=font_rgb;
 		end if;
-
-		end process;
+	end if;
+	end process;
 end arch;
