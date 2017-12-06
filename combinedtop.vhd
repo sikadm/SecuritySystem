@@ -13,6 +13,11 @@ entity Final_Security_System is
       hsync, vsync, enable, blank, sync: out std_logic;
       column1, row1: out integer;
       rgb: out std_logic_vector (2 downto 0));
+    rowco      :  IN   INTEGER;    --row pixel coordinate
+    columnco   :  IN   INTEGER;    --column pixel coordinate
+    red      :  OUT  STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');  --red magnitude output to DAC
+    green    :  OUT  STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');  --green magnitude output to DAC
+    blue     :  OUT  STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0')); --blue magnitude output to DAC
 	end Final_Security_System;
 	
 architecture beh of Final_Security_System is 
