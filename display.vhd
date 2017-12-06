@@ -15,6 +15,7 @@ entity SecuritySystem is
  
  architecture arch of SecuritySystem is
 	type state_type is (sysArmed, sysDisarmed);
+	signal state_reg, state_next: state_type; 
 	signal video_on, pixel_tick, armed1_on, disarmed1_on: std_logic;
 	signal pixel_x, pixel_y: std_logic_vector(9 downto 0);
 	signal text_on: std_logic_vector(3 downto 0);
@@ -61,6 +62,67 @@ entity SecuritySystem is
 		A1: armed port map (clk, reset, armed1_on, pixel_x, pixel_y,text_on, text_rgb);
 		D1: armed port map (clk, reset, disarmed1_on, pixel_x, pixel_y, text_on, text_rgb);	
 
+			 -- registers
+ process (clk, reset)
+ begin
+ if reset='1' then
+ state_reg <= sysArmed;
+ ball_reg <= (others=>'0');
+ rgb_reg <= (others=>'0');
+ elsif (clk'event and clk='1') then
+ state_reg <= state_next;
+ ball_reg <= ball_next;
+ if (pixel_tick='1') then
+ rgb_reg <= rgb_next;
+ end if;
+ end if;
+ end process; 
+
+ process(btn, hit, miss, timer_up, state_reg, ball_reg, ball_next)
+ begin
+ gra_still <= '1';
+ timer_start <='0';
+ d_inc <= '0';
+ d_clr <= '0';
+ state_next <= state_reg;
+ ball_next <= ball_reg; 
+
+case state_reg is
+ when newgame =>
+ ball_next <= "11"; -- three balls
+ d_clr <= '1'; -- clear score
+ if (btn /= "00") then -- button pressed
+ state_next <= play;
+ ball_next <= ball_reg - 1;
+ end if; 
+
+ when play =>
+ gra_still <= '0'; -- animated screen
+ if hit='1' then
+ d_inc <= '1'; -- increment score
+ elsif miss='1' then
+ if (ball_reg=0) then
+ state_next <= over;
+ else
+ state_next <= newball;
+ end if;
+ timer_start <= '1'; -- 2 sec timer
+ ball_next <= ball_reg - 1;
+ end if; 
+	 
+ when newball =>
+ -- wait for 2 sec and until button pressed
+ if timer_up='1' and (btn /= "00") then
+ state_next <= play;
+ end if;
+ when over =>
+ -- wait for 2 sec to display game over
+ if timer_up='1' then
+ state_next <= newgame;
+ end if;
+ end case;
+ end process; 
+	 
  process(state_reg, video_on, graph_on, graph_rgb, text_on, text_rgb)
  begin
  if video_on='0' then
