@@ -61,18 +61,26 @@ entity SecuritySystem is
 		A1: armed port map (clk, reset, armed1_on, pixel_x, pixel_y,text_on, text_rgb);
 		D1: armed port map (clk, reset, disarmed1_on, pixel_x, pixel_y, text_on, text_rgb);	
 
---process	
---begin
---		if video_on='0' then
---			rgb_next<="000";
---		else
---			if (correct='1') then 
---				rgb_next:=text_rgb;
---			else
---				rgb_next:=text_rgb;
---			end if;
---		end if;
---	end process;
---	rgb<=rgb_reg;
-	end arch;
+ process(state_reg, video_on, graph_on, graph_rgb, text_on, text_rgb)
+ begin
+ if video_on='0' then
+ 	rgb_next <= "000"; -- blank the edge/retrace
+ else
+ -- display score, rule or game over
+ if (text_on(3)='1') or -- score
+ 	(state_reg=newgame and text_on(1)='1') or -- rule
+ 	(state_reg=over and text_on(0)='1') then -- over
+ 	rgb_next <= text_rgb;
+ elsif graph_on='1' then -- display graph
+ 	rgb_next <= graph_rgb; 
+elsif text_on(2)='1' then -- display logo
+ 	rgb_next <= text_rgb;
+ else
+ 	rgb_next <= "110"; -- yellow background
+ end if;
+ end if;
+ end process;
+ rgb <= rgb_reg; 
+	 
+end arch;
 	
