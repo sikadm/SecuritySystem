@@ -3,16 +3,16 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.STD_LOGIC_ARITH.all;
 use IEEE.STD_LOGIC_UNSIGNED.all;
 
-entity Final_Security_System is 
+entity SecSys is 
 	port (reset, clk : in std_logic;
 			but_n1, but_n2, but_n3 : in std_logic;
 			a1, b1, c1, d1, e1, f1, g1 : out std_logic;
 			a2, b2, c2, d2, e2, f2, g2 : out std_logic;
 			LED1, LED2, LED3, LED4, LED5, LED6 : out std_logic;
 			door_n, armed : in std_logic);
-	end Final_Security_System;
+	end SecSys;
 	
-architecture beh of Final_Security_System is 
+architecture beh of SecSys is 
 
 type state_type is (STATE_Armed, STATE_Count, STATE_Alarm, STATE_Disarmed); 
 signal state : state_type := STATE_Disarmed;
@@ -20,7 +20,7 @@ signal tens, ones : std_logic_vector(3 downto 0);
 signal counter10 : std_logic_vector(28 downto 0);
 signal counter1 : std_logic_vector(25 downto 0);
 signal in0, in1, in2, in3 : std_logic;
-signal code : std_logic;
+signal code : std_logic_vector(1 downto 0);
 signal lights : std_logic;
 
 	component sevenSegDisplay 
@@ -31,7 +31,7 @@ signal lights : std_logic;
 	component passcode
 		port (clk : in std_logic;
 				but_n1, but_n2, but_n3 : in std_logic;
-				code : out std_logic);
+				code : out std_logic_vector(1 downto 0));
 	end component;
 	
 begin
@@ -44,7 +44,7 @@ begin
 					(ones(3), ones(2), ones(1), ones(0),
 					 a2, b2, c2, d2, e2, f2, g2);
 					 
-	passcode1 : passcode port map(clk, but_n1, but_n2, but_n3, code);
+	
 	
 	LED1 <= lights;
 	LED2 <= lights;
@@ -61,8 +61,10 @@ begin
 			case state is
 			
 				when STATE_Disarmed =>
+					tens <= "0000";
+					ones <= "0000";
 					lights <= '0';
-					code <= null;
+					code <= "01";
 					if armed = '1' then
 						state <= STATE_Armed;
 					else 
@@ -71,14 +73,16 @@ begin
 			
 				when STATE_Armed =>
 					if door_n = '0' then
+						tens <= "0110";
+						ones <= "0000";
+						code <= "01";
 						state <= STATE_Count;
 					else
 						state <= STATE_Armed;
 					end if;
 				
-				
 				when STATE_Count =>
-					tens <= "0110";
+					
 						if counter10 < "11101110011010110010100000000" then
 							counter10 <= counter10 + 1;
 						else 
@@ -86,7 +90,6 @@ begin
 							counter10 <= (others => '0');
 						end if;
 					
-					ones <= "0000";
 						if counter1 < "10111110101111000010000000" then
 							counter1 <= counter1 + 1;
 						elsif ones = "0000" then
@@ -97,9 +100,9 @@ begin
 							counter1 <= (others => '0');
 						end if;
 					
-					if code = '1' then
+					if code = "11" then
 						state <= STATE_Disarmed;
-					elsif ((tens = "0000" and ones = "0000") or code = '0') then
+					elsif ((tens = "0000" and ones = "0000") or code = "00") then
 						state <= STATE_Alarm;
 					end if;
 					
@@ -112,7 +115,6 @@ begin
 							counter1 <= (others => '0');
 						end if;
 
-					lights <= '1';
 					state <= STATE_Alarm;
 					
 			end case;
