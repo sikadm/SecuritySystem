@@ -3,13 +3,13 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.STD_LOGIC_ARITH.all;
 use IEEE.STD_LOGIC_UNSIGNED.all;
 
-entity TestSecuritySystem is 
+entity passcode is 
 	port (clk : in std_logic;
 			but_n1, but_n2, but_n3 : in std_logic;
 			code, one, two, three, four : out std_logic);
-end TestSecuritySystem;
+end passcode;
 	
-architecture beh of TestSecuritySystem is 
+architecture beh of passcode is 
 
 	type state_type is (STATE_A, STATE_B, STATE_C, STATE_D, STATE_E, STATE_F); 
 	signal state : state_type := STATE_A;
@@ -50,7 +50,7 @@ begin
 			four <= '0';
 		if (but_n1 = '0') then
 			state <= STATE_C;
-		elsif (but_n2 = '0' or but_n3 = '0') then
+		elsif (but_n3 = '0') then
 			state <= STATE_F;
 		else 
 			if counter < "10110010110100000101111000000000" then
@@ -68,7 +68,7 @@ begin
 			four <= '0';
 		if (but_n3 = '0') then
 			state <= STATE_D;
-		elsif (but_n1 = '0' or but_n2 = '0') then
+		elsif (but_n2 = '0') then
 			state <= STATE_F;
 		else 
 			if counter < "10110010110100000101111000000000" then
@@ -86,7 +86,7 @@ begin
 			four <= '1';
 		if (but_n1 = '0') then
 			state <= STATE_E;
-		elsif (but_n2 = '0' or but_n3 = '0') then
+		elsif (but_n2 = '0') then
 			state <= STATE_F;
 		else
 			if counter < "10110010110100000101111000000000" then
