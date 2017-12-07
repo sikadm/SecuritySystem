@@ -25,8 +25,34 @@ USE ieee.std_logic_1164.all;
 
 ENTITY hw_image_generator IS
   GENERIC(
-    pixels_y :  INTEGER := 478;   --row that first color will persist until
-    pixels_x :  INTEGER := 600);  --column that first color will persist until
+    py1: INTEGER :=128;   
+    py2: INTEGER :=192;
+    py3: INTEGER :=256;
+    py4: INTEGER :=320;
+    py5: INTEGER :=384;
+    py6: INTEGER :=448;
+    py7: INTEGER :=512;
+    py8: INTEGER :=576;
+    py9: INTEGER :=640;
+    py10: INTEGER :=704;
+    py11: INTEGER :=768;
+    py12: INTEGER :=832;
+    py13: INTEGER :=896;
+    py14: INTEGER :=960;
+    py15: INTEGER :=1024;
+    py16: INTEGER :=1088;
+    
+    px1: INTEGER :=340; 
+    px2: INTEGER :=420;
+    px3: INTEGER :=500;
+    px4: INTEGER :=580;
+    px5: INTEGER :=660;
+    px6: INTEGER :=740;
+    px7: INTEGER :=820;
+    px8: INTEGER :=900;
+    px9: INTEGER :=980;
+    px10: INTEGER :=1060;
+    
   PORT(
     disp_ena :  IN   STD_LOGIC;  --display enable ('1' = display time, '0' = blanking time)
     row      :  IN   INTEGER;    --row pixel coordinate
@@ -42,20 +68,163 @@ BEGIN
   BEGIN
 
     IF(disp_ena = '1') THEN        --display time
-      IF(row < pixels_y AND column < pixels_x) THEN
-        red <= (OTHERS => '0');
-        green  <= (OTHERS => '0');
-        blue <= (OTHERS => '1');
-      ELSE
+      IF (row=x1)
+        IF ((column >= py1 AND column <=py2) OR (column>=py4 AND column <=py5) OR (column>=py6 AND column <=py7 OR (column >= py13 AND column <=py14) OR (column >= py15 AND column <=py16)) THEN
         red <= (OTHERS => '1');
-        green  <= (OTHERS => '1');
+        green  <= (OTHERS => '0');
+        blue <= (OTHERS => '0');
+      ELSE                           --blanking time
+        red <= (OTHERS => '0');
+        green <= (OTHERS => '0');
         blue <= (OTHERS => '0');
       END IF;
+     ELSIF (row=px2)
+       IF ((column >= py1 AND column <=py2) OR (column>=py4 AND column <=py5) OR (column>=py6 AND column <=py7) OR (column>=py8 AND column<=py9) OR 
+              (column>=py10 AND column<=py12) OR (column >= py13 AND column <=py14) OR (column >= py15 AND column <=py16)) THEN
+        red <= (OTHERS => '1');
+        green  <= (OTHERS => '0');
+        blue <= (OTHERS => '0');
+      ELSE                           --blanking time
+        red <= (OTHERS => '0');
+        green <= (OTHERS => '0');
+        blue <= (OTHERS => '0');
+      END IF;
+      IF 
+      ELSIF (column=py1)
+       IF (row>=px1 AND row<=px2) THEN
+        red <= (OTHERS => '1');
+        green  <= (OTHERS => '0');
+        blue <= (OTHERS => '0')
+       ELSE                           --blanking time
+        red <= (OTHERS => '0');
+        green <= (OTHERS => '0');
+        blue <= (OTHERS => '0');
+      END IF;
+      ELSIF (column=py2 OR column=py16)
+        IF (row>=px1 AND row<=px3) THEN
+        red <= (OTHERS => '1');
+        green  <= (OTHERS => '0');
+        blue <= (OTHERS => '0');
+       ELSE                           --blanking time
+        red <= (OTHERS => '0');
+        green <= (OTHERS => '0');
+        blue <= (OTHERS => '0');
+      END IF;
+      ELSIF (column=py3)
+        IF ((row>=px1 AND row<=px2) OR row=px5 THEN
+         red <= (OTHERS => '1');
+        green  <= (OTHERS => '0');
+        blue <= (OTHERS => '0');
+       ELSE                           --blanking time
+        red <= (OTHERS => '0');
+        green <= (OTHERS => '0');
+        blue <= (OTHERS => '0');
+      END IF;
+      ELSIF (column=py4 OR column=py14) THEN
+        IF (row>=px4 AND row<=px2) THEN
+        red <= (OTHERS => '1');
+        green  <= (OTHERS => '0');
+        blue <= (OTHERS => '0');
+       ELSE                           --blanking time
+        red <= (OTHERS => '0');
+        green <= (OTHERS => '0');
+        blue <= (OTHERS => '0');
+      END IF; 
+      ELSIF (column=py5)
+        IF (row>=px1 AND row<=px4) THEN
+          red <= (OTHERS => '1');
+        green  <= (OTHERS => '0');
+        blue <= (OTHERS => '0');
+       ELSE                           --blanking time
+        red <= (OTHERS => '0');
+        green <= (OTHERS => '0');
+        blue <= (OTHERS => '0');
+      END IF; 
+       ELSIF (column=py6)
+        IF (row>=px1 AND row<=px2) THEN
+          red <= (OTHERS => '1');
+        green  <= (OTHERS => '0');
+        blue <= (OTHERS => '0');
+       ELSE                           --blanking time
+        red <= (OTHERS => '0');
+        green <= (OTHERS => '0');
+        blue <= (OTHERS => '0');
+      END IF;  
+       ELSIF (column=py7)
+        IF (row>=px1 AND row<=px5) THEN
+          red <= (OTHERS => '1');
+        green  <= (OTHERS => '0');
+        blue <= (OTHERS => '0');
+       ELSE                           --blanking time
+        red <= (OTHERS => '0');
+        green <= (OTHERS => '0');
+        blue <= (OTHERS => '0');
+      END IF;
+       ELSIF (column=py8)
+        IF (row>=px1 AND row<=px5) THEN
+          red <= (OTHERS => '1');
+        green  <= (OTHERS => '0');
+        blue <= (OTHERS => '0');
+       ELSE                           --blanking time
+        red <= (OTHERS => '0');
+        green <= (OTHERS => '0');
+        blue <= (OTHERS => '0');
+      END IF;
+      ELSIF (column=py9)
+        IF (row>=px4 AND row<=px2) THEN
+          red <= (OTHERS => '1');
+        green  <= (OTHERS => '0');
+        blue <= (OTHERS => '0');
+       ELSE                           --blanking time
+        red <= (OTHERS => '0');
+        green <= (OTHERS => '0');
+        blue <= (OTHERS => '0');
+      END IF;
+      ELSIF (column=py10)
+        IF (row>=px1 AND row<=px5) THEN
+          red <= (OTHERS => '1');
+        green  <= (OTHERS => '0');
+        blue <= (OTHERS => '0');
+       ELSE                           --blanking time
+        red <= (OTHERS => '0');
+        green <= (OTHERS => '0');
+        blue <= (OTHERS => '0');
+      END IF; 
+      ELSIF (column=py11 OR column=py12 OR column=py13 OR column=py15)
+        IF (row>=px1 AND row<=px2) THEN
+          red <= (OTHERS => '1');
+        green  <= (OTHERS => '0');
+        blue <= (OTHERS => '0');
+       ELSE                           --blanking time
+        red <= (OTHERS => '0');
+        green <= (OTHERS => '0');
+        blue <= (OTHERS => '0');
+      END IF;
+       ELSIF (row=px4)
+        IF (column>=py4 AND column<=py5) OR (column>=py13 AND column<=py14) THEN
+          red <= (OTHERS => '1');
+        green  <= (OTHERS => '0');
+        blue <= (OTHERS => '0');
+       ELSE                           --blanking time
+        red <= (OTHERS => '0');
+        green <= (OTHERS => '0');
+        blue <= (OTHERS => '0');
+      END IF; 
+        ELSIF (row=px5)
+        IF (column>=py6 AND column<=py7) THEN
+          red <= (OTHERS => '1');
+        green  <= (OTHERS => '0');
+        blue <= (OTHERS => '0');
+       ELSE                           --blanking time
+        red <= (OTHERS => '0');
+        green <= (OTHERS => '0');
+        blue <= (OTHERS => '0');
+      END IF;      
     ELSE                           --blanking time
       red <= (OTHERS => '0');
       green <= (OTHERS => '0');
       blue <= (OTHERS => '0');
     END IF;
-  
+
   END PROCESS;
 END behavior;
