@@ -1,7 +1,7 @@
 Library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 
-entity sevenSegDisplay is 
+entity sevenSegDisplay is 	-- taken directly from display lab
 	port (in0, in1, in2, in3 : in std_logic;
 			a, b, c, d, e, f, g : out std_logic);
 end sevenSegDisplay;
