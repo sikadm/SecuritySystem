@@ -6,7 +6,7 @@ use IEEE.STD_LOGIC_UNSIGNED.all;
 entity TestSecuritySystem is 
 	port (clk : in std_logic;
 			but_n1, but_n2, but_n3 : in std_logic;
-			code, two : out std_logic);
+			code, one, two, three, four : out std_logic);
 end TestSecuritySystem;
 	
 architecture beh of TestSecuritySystem is 
@@ -25,9 +25,12 @@ begin
 		case state is
 		
 		when STATE_A =>
-		two <= '0';
+		code <= '0';
+			one <= '1';
+			two <='0';
+			three <= '0';
+			four <= '0';
 		if (but_n2 = '0') then 	-- button2 has been pressed
-			two <= '1';
 			state <= STATE_B;
 		elsif (but_n1 = '0' or but_n3 = '0') then
 			state <= STATE_F;
@@ -40,7 +43,12 @@ begin
 		end if;
 		
 		when STATE_B =>
-		if but_n1 = '0' then
+		code <= '0';
+			one <= '0';
+			two <='1';
+			three <= '0';
+			four <= '0';
+		if (but_n1 = '0') then
 			state <= STATE_C;
 		elsif (but_n2 = '0' or but_n3 = '0') then
 			state <= STATE_F;
@@ -53,7 +61,12 @@ begin
 		end if;
 		
 		when STATE_C =>
-		if but_n3 = '0' then
+			code <= '0';
+			one <= '0';
+			two <='0';
+			three <= '1';
+			four <= '0';
+		if (but_n3 = '0') then
 			state <= STATE_D;
 		elsif (but_n1 = '0' or but_n2 = '0') then
 			state <= STATE_F;
@@ -66,7 +79,12 @@ begin
 		end if;
 		
 		when STATE_D =>
-		if but_n1 = '0' then
+			code <= '0';
+			one <= '0';
+			two <='0';
+			three <= '0';
+			four <= '1';
+		if (but_n1 = '0') then
 			state <= STATE_E;
 		elsif (but_n2 = '0' or but_n3 = '0') then
 			state <= STATE_F;
@@ -80,9 +98,22 @@ begin
 		
 		when STATE_E => 	-- code is correct
 			code <= '1';
+			one <= '1';
+			two <='1';
+			three <= '1';
+			four <= '1';
 			
 		when STATE_F => 	-- code is incorrect
 			code <= '0';
+			one <= '0';
+			two <='0';
+			three <= '0';
+			four <= '0';
+		
+		
+		when others =>
+		state <= STATE_A;
+		
 		end case;
 		end if;
 	end process;
